@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <thread>
+// test
 
 // write a template function to print anything
 template <typename T> void print(const T &t) { std::cout << t << std::endl; }
@@ -14,7 +15,6 @@ void print(const T &t, const Args &...args) {
 int main(int argc, char *argv[]) {
   for (int i = 0; i < 3; i++) {
     // print(i, i + 1, i + 2);
-    print("2234adfaa34", 2, 234, 1.1);
     print("2234adfaa34", 2, 234, 1.1);
   }
 
