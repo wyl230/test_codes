@@ -35,3 +35,6 @@ dll/
 a
 a.py
 cpp/valgrind/massif.out.3015514
+python/test_proto/test_simulation_proto
+tmptest
+cpp/benchmark/sltbench
