@@ -38,3 +38,10 @@ set_target_properties(sltbench_examples PROPERTIES
 	CXX_EXTENSIONS NO)
 
 target_link_libraries(sltbench_examples PRIVATE sltbench)
+
+find_package(Threads REQUIRED)
+target_link_libraries(sltbench_examples PRIVATE Threads::Threads)
+
+
+
+

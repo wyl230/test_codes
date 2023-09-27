@@ -27,12 +27,8 @@ void test_cb_res_no_get(decltype(callback_future) cb) {
 }
 
 int main(int argc, char *argv[]) {
-  std::future<bool> job_done = std::async(std::launch::async, []() {
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    print("done");
-    return true;
-  });
-  std::this_thread::sleep_for(std::chrono::seconds(1));
-  print("done2");
-  print(job_done.get());
+  print(argc, argv[0]);
+  print("Hello world!");
+  // test(callback);
+  test_cb_res_no_get(callback_future);
 }
