@@ -15,12 +15,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_compile_options(-Wall -Wextra)
 
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
-# add_executable(test main.c)
+# add_executable(test main.c) 如果有头文件，可以将它们包含在项目中
 add_executable(test main.cpp)
-# 如果有头文件，可以将它们包含在项目中
 target_include_directories(test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-
 target_include_directories(test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_include_directories(test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../time)
 
 # include_directories(/home/wyl/ln/test/cpp)
 
@@ -36,19 +35,18 @@ link_directories(${CMAKE_SOURCE_DIR})
 target_link_libraries(test PRIVATE Threads::Threads)
 # target_link_libraries(test PRIVATE http_lib)
 #
-# ## FetchContent # add my http_lib include(FetchContent)
-#
-# FetchContent_Declare( readerwriterqueue GIT_REPOSITORY
-# https://github.com/cameron314/readerwriterqueue GIT_TAG           master )
-#
-# FetchContent_MakeAvailable(readerwriterqueue)
-#
-# target_link_libraries(test PUBLIC readerwriterqueue)
-#
-# # add json include(FetchContent)
-#
-# FetchContent_Declare(json URL
-# https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
-# FetchContent_MakeAvailable(json)
-#
-# target_link_libraries(test PRIVATE nlohmann_json::nlohmann_json)
+# https://kingsamchen.github.io/2019/08/10/asio-cmake-package-wrapper/
+include(FetchContent)
+
+FetchContent_Declare(
+  asio-cmake
+  GIT_REPOSITORY https://github.com/kingsamchen/asio-cmake.git
+  GIT_TAG origin/master)
+
+# Specify asio version
+set(ASIO_CMAKE_ASIO_TAG asio-1-12-2)
+FetchContent_MakeAvailable(asio-cmake)
+
+# ...
+
+target_link_libraries(test PRIVATE asio)
