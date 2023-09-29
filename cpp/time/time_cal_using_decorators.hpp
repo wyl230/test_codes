@@ -45,6 +45,7 @@ template <typename funcType> void exclaim(const funcType &func) {
 
 // Function to measure time interval
 
+namespace my_test_time {
 inline void test() {
   exclaim([]() {
     for (int i = 0; i < 10; ++i) {
@@ -52,3 +53,5 @@ inline void test() {
     }
   });
 }
+
+}; // namespace my_test_time

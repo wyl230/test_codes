@@ -1,4 +1,5 @@
 
+#include <better_print.hpp>
 #include <boost/asio.hpp>
 #include <iostream>
 
@@ -31,7 +32,8 @@ private:
         socket_, buffer("Hello, World!\n"),
         [](const boost::system::error_code &ec, std::size_t bytes_transferred) {
           if (!ec) {
-            std::cout << "Response sent." << std::endl;
+            print("Response sent", bytes_transferred);
+            // std::cout << "Response sent." << std::endl;
           }
         });
   }
