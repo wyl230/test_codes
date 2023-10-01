@@ -16,7 +16,7 @@ add_compile_options(-Wall -Wextra)
 
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 # add_executable(test main.c) add_executable(test main.cpp )
-add_executable(test test.cpp)
+add_executable(test main.cpp)
 # 如果有头文件，可以将它们包含在项目中
 target_include_directories(test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -69,3 +69,16 @@ FetchContent_MakeAvailable(asio-cmake)
 # ...
 
 target_link_libraries(test PRIVATE asio)
+
+# boost
+set(BOOST_INCLUDE_LIBRARIES thread filesystem system program_options)
+set(BOOST_ENABLE_CMAKE ON)
+
+include(FetchContent)
+FetchContent_Declare(
+  Boost
+  GIT_REPOSITORY https://github.com/boostorg/boost.git
+  GIT_TAG boost-1.83.0)
+FetchContent_MakeAvailable(Boost)
+
+target_link_libraries(test PRIVATE Boost::filesystem Boost::program_options)
