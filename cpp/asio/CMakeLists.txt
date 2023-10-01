@@ -5,13 +5,21 @@ cmake_minimum_required(VERSION 3.17)
 project(test)
 # message("my_variable: ${PROJECT_SOURCE_DIR}/http_lib")
 
-# 1. set compiler
-set(CMAKE_CXX_STANDARD 17)
+# 1. set compiler set(CMAKE_CXX_STANDARD 17)
+
+set(Boost_NO_SYSTEM_PATHS TRUE)
+set(CMAKE_CXX_STANDARD 20)
+
+set(CMAKE_CXX_FLAGS
+    "${CMAKE_CXX_FLAGS} -fcoroutines -fexceptions -O0 -std=c++20 -I/home/wyl/chores/usr/local/include -L/home/wyl/chores/usr/local/lib " # 后两个只是为了让clangd工具能够找到正确版本的boost，实际的boost再fetch的时候已经指定了
+)
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines -fno-exceptions -O0")
+
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# add compile options
+# add compile options set(FORTE_RTTI_AND_EXCEPTIONS true)
 add_compile_options(-Wall -Wextra)
 
 set(CMAKE_THREAD_PREFER_PTHREAD ON)

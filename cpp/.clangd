@@ -1,0 +1,7 @@
+{
+  "compilationDatabasePath": "./build/compile_commands.json",
+  "fallbackFlags": ["-I./build/deps_/include"],
+  "index": {
+    "enable": true
+  },
+}

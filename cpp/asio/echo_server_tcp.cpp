@@ -9,17 +9,18 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include <asio/co_spawn.hpp>
-#include <asio/detached.hpp>
-#include <asio/io_context.hpp>
-#include <asio/ip/tcp.hpp>
-#include <asio/signal_set.hpp>
-#include <asio/write.hpp>
+#include <boost/asio/co_spawn.hpp>
+#include <boost/asio/detached.hpp>
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/signal_set.hpp>
+#include <boost/asio/write.hpp>
 #include <cstdio>
 #include <iostream>
 
+namespace asio = boost::asio;
 namespace sys = boost::system;
-using asio::ip::tcp;
+using boost::asio::ip::tcp;
 
 void report_error(std::string_view component, sys::error_code ec) {
   std::cerr << component << " failure: " << ec << " ()" << ec.message()

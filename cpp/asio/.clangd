@@ -1,0 +1,12 @@
+If:
+  PathMatch: .*\.hpp
+CompileFlags:
+  # Add: -Wno-unused-function
+  Remove: -Wno-unused-function
+# -Wunused-member-function false positive:
+# https://github.com/clangd/clangd/issues/363
+CompileFlagsButNotReally: # broken here
+  Add: [-Wno-unused-macros,-Wno-unused-member-function,-Wno-unused-template]
+Diagnostics:
+  ClangTidy:
+    Add: *
