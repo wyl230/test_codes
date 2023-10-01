@@ -6,9 +6,7 @@ project(test)
 # message("my_variable: ${PROJECT_SOURCE_DIR}/http_lib")
 
 # 1. set compiler
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines -fno-exceptions -O0")
-# set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -17,12 +15,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_compile_options(-Wall -Wextra)
 
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
-# add_executable(test co_return.c)
-add_executable(test co_return.cpp)
+# add_executable(test main.c) add_executable(test main.cpp )
+add_executable(test test.cpp)
 # 如果有头文件，可以将它们包含在项目中
 target_include_directories(test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_include_directories(test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_include_directories(test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../time)
 
 # include_directories(/home/wyl/ln/test/cpp)
 
@@ -45,7 +44,7 @@ target_link_libraries(test PRIVATE Threads::Threads)
 #
 # FetchContent_MakeAvailable(readerwriterqueue)
 #
-# target_link_libraries(coroutine_test PUBLIC readerwriterqueue)
+# target_link_libraries(test PUBLIC readerwriterqueue)
 #
 # # add json include(FetchContent)
 #
@@ -53,4 +52,20 @@ target_link_libraries(test PRIVATE Threads::Threads)
 # https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
 # FetchContent_MakeAvailable(json)
 #
-# target_link_libraries(coroutine_test PRIVATE nlohmann_json::nlohmann_json)
+# target_link_libraries(test PRIVATE nlohmann_json::nlohmann_json)
+
+# https://kingsamchen.github.io/2019/08/10/asio-cmake-package-wrapper/
+include(FetchContent)
+
+FetchContent_Declare(
+  asio-cmake
+  GIT_REPOSITORY https://github.com/kingsamchen/asio-cmake.git
+  GIT_TAG origin/master)
+
+# Specify asio version
+set(ASIO_CMAKE_ASIO_TAG asio-1-28-0)
+FetchContent_MakeAvailable(asio-cmake)
+
+# ...
+
+target_link_libraries(test PRIVATE asio)
