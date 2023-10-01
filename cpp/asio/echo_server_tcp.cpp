@@ -1,23 +1,17 @@
-// TCP echo server implemented with Boost.ASIO and C++20 coroutines
-//
-// Copyright (c) 2021 Andrzej Krzemieński (akrzemi1 at gmail dot com)
-//
-// Based heavily on the example by Christopher M. Kohlhoff at:
-// https://www.boost.org/doc/libs/1_78_0/doc/html/boost_asio/example/cpp17/coroutines_ts/echo_server.cpp
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
-
+// 为什么第二个listener执行到acceptor就停止
 #include <better_print.hpp>
 #include <boost/asio/co_spawn.hpp>
 #include <boost/asio/detached.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/signal_set.hpp>
+#include <boost/asio/use_awaitable.hpp>
 #include <boost/asio/write.hpp>
+#include <boost/system/error_code.hpp>
+#include <boost/system/system_error.hpp>
 #include <cstdio>
 #include <iostream>
+#include <vector>
 
 namespace asio = boost::asio;
 namespace sys = boost::system;
@@ -46,16 +40,28 @@ asio::awaitable<void> session(tcp::socket socket) {
 }
 
 asio::awaitable<void> listener(asio::io_context &context, unsigned short port) {
-  tcp::acceptor acceptor(context, {tcp::v4(), port});
-
+  // tcp::acceptor acceptor(context, {tcp::v4(), port});
+  // 端口占用时没有提示
   try {
-    for (;;) {
-      tcp::socket socket = co_await acceptor.async_accept(asio::use_awaitable);
-      print("we get a connection");
-      asio::co_spawn(context, session(std::move(socket)), asio::detached);
+    tcp::acceptor acceptor(context, {tcp::v4(), port});
+    std::cout << "Acceptor created successfully." << std::endl;
+    // 在这里可以继续使用acceptor
+    try {
+      for (;;) {
+        tcp::socket socket =
+            co_await acceptor.async_accept(asio::use_awaitable);
+        print("we get a connection ");
+        asio::co_spawn(context, session(std::move(socket)), asio::detached);
+      }
+    } catch (sys::system_error const &e) {
+      report_error("Listener", e.code());
     }
-  } catch (sys::system_error const &e) {
-    report_error("Listener", e.code());
+  } catch (const boost::system::system_error &error) {
+    if (error.code() == boost::asio::error::address_in_use) {
+      std::cerr << "Port " << port << " is already in use." << std::endl;
+    } else {
+      std::cerr << "Error: " << error.what() << std::endl;
+    }
   }
 }
 
@@ -66,8 +72,15 @@ int main() {
     asio::signal_set signals(context, SIGINT, SIGTERM);
     signals.async_wait([&](auto, auto) { context.stop(); });
 
-    auto listen = listener(context, 55555);
-    asio::co_spawn(context, std::move(listen), asio::detached);
+    std::vector<asio::awaitable<void>> listeners;
+
+    // Start multiple listeners on different ports
+    listeners.push_back(listener(context, 55555));
+    listeners.push_back(listener(context, 55556)); // Add more ports as needed
+
+    for (auto &listen : listeners) {
+      asio::co_spawn(context, std::move(listen), asio::detached);
+    }
 
     context.run();
     std::cerr << "Server done \n";
