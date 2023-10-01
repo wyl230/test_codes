@@ -9,6 +9,7 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
+#include <better_print.hpp>
 #include <boost/asio/co_spawn.hpp>
 #include <boost/asio/detached.hpp>
 #include <boost/asio/io_context.hpp>
@@ -33,6 +34,7 @@ asio::awaitable<void> session(tcp::socket socket) {
     for (;;) {
       std::size_t n = co_await socket.async_read_some(asio::buffer(data),
                                                       asio::use_awaitable);
+      print("we receive", data);
       co_await async_write(socket, asio::buffer(data, n), asio::use_awaitable);
     }
   } catch (sys::system_error const &e) {
@@ -49,6 +51,7 @@ asio::awaitable<void> listener(asio::io_context &context, unsigned short port) {
   try {
     for (;;) {
       tcp::socket socket = co_await acceptor.async_accept(asio::use_awaitable);
+      print("we get a connection");
       asio::co_spawn(context, session(std::move(socket)), asio::detached);
     }
   } catch (sys::system_error const &e) {

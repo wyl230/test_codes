@@ -2,7 +2,7 @@
 mkdir -p build
 cd ./build
 cmake ..
-make -j 32
+make -j 64
 echo "buid ok, program begin..."
 echo "============================="
 ./test
