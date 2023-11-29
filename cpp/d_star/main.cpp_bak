@@ -1,0 +1,228 @@
+#include <cmath>
+#include <iostream>
+#include <limits>
+#include <print.hpp>
+#include <queue>
+#include <thread>
+#include <vector>
+
+using namespace std;
+
+const double maxCost = 100000;
+
+// 定义节点类
+class Node {
+public:
+  int x, y;
+  double actual_cost, estimated_min_cost;
+
+  Node() = default;
+
+  Node(int x, int y)
+      : x(x), y(y), actual_cost(maxCost), estimated_min_cost(maxCost) {}
+  // : x(x), y(y), actual_cost(numeric_limits<double>::infinity()),
+  //   estimated_min_cost(numeric_limits<double>::infinity()) {}
+
+  // 用于节点比较的小于运算符
+  bool operator<(const Node &other) const {
+    if (std::isinf(actual_cost) && std::isinf(other.actual_cost)) {
+      // If both nodes have infinite cost, you may compare other attributes or
+      // return based on some rule. For example, you could compare
+      // estimated_min_cost in this case.
+      return estimated_min_cost > other.estimated_min_cost;
+    }
+    if (std::isinf(actual_cost) && !std::isinf(other.actual_cost)) {
+      return false; // If current node has infinite cost, it's not less than the
+                    // other.
+    }
+    if (!std::isinf(actual_cost) && std::isinf(other.actual_cost)) {
+      return true; // If other node has infinite cost, current node is less than
+                   // it.
+    }
+    return (actual_cost + h(other)) > (other.actual_cost + other.h(other));
+  }
+
+  // 计算当前节点到目标节点的启发式值（这里简单地使用曼哈顿距离）
+  // 启发函数
+  [[nodiscard]] double h(const Node &goal) const {
+    return abs(x - goal.x) + abs(y - goal.y);
+  }
+
+  bool operator==(const Node &other) const {
+    return x == other.x && y == other.y;
+  }
+
+  friend std::ostream &operator<<(std::ostream &os, const Node &node) {
+    os << "Node(" << node.x << ", " << node.y
+       << ", actual cost: " << node.actual_cost
+       << ", min cost: " << node.estimated_min_cost << ")";
+    return os;
+  }
+};
+
+// 定义D* Lite算法类
+class DStarLite {
+public:
+  int rows, cols;
+  Node start, goal;
+  vector<vector<Node>> grid;
+  priority_queue<Node> openSet;
+
+  DStarLite(int rows, int cols, int startX, int startY, int goalX, int goalY)
+      : rows(rows), cols(cols), start(startX, startY), goal(goalX, goalY),
+        grid(rows, vector<Node>(cols, Node(0, 0))) {
+    for (int i = 0; i < rows; ++i) {
+      for (int j = 0; j < cols; ++j) {
+        grid[i][j].x = i;
+        grid[i][j].y = j;
+      }
+    }
+  }
+
+  // 初始化算法
+  void initialize() {
+    start.estimated_min_cost = 0;
+    openSet.push(start);
+  }
+
+  // 更新节点的rhs值
+  void updateVertex(Node &node) {
+    if (node != start) {
+      node.estimated_min_cost = maxCost;
+      for (int i = -1; i <= 1; ++i) {
+        for (int j = -1; j <= 1; ++j) {
+          if (i == 0 && j == 0)
+            continue;
+
+          int newX = node.x + i;
+          int newY = node.y + j;
+
+          if (isValid(newX, newY)) {
+            double cost = 1.0; // Assuming uniform cost for simplicity
+            double newRhs = grid[newX][newY].actual_cost + cost;
+
+            if (newRhs < node.estimated_min_cost) {
+              node.estimated_min_cost = newRhs;
+            }
+          }
+        }
+      }
+    }
+
+    if (openSet.top() != node) {
+      openSet.push(node);
+    }
+  }
+
+  // 检查坐标是否在有效范围内
+  [[nodiscard]] bool isValid(int x, int y) const {
+    return x >= 0 && x < rows && y >= 0 && y < cols;
+  }
+
+  // 执行D* Lite算法
+  void runDStarLite() {
+    initialize();
+
+    if (!openSet.empty()) {
+      print("not empty");
+    }
+    print("top goal");
+    print(openSet.top());
+    print(goal);
+    if ((openSet.top() < goal)) {
+      print("top < goal");
+    }
+
+    if ((goal.estimated_min_cost != goal.actual_cost)) {
+      print("3");
+    }
+    while (!openSet.empty() && (openSet.top() < goal ||
+                                goal.estimated_min_cost != goal.actual_cost)) {
+      Node u = openSet.top();
+      print("pop: ", u);
+      openSet.pop();
+
+      if (u.actual_cost > u.estimated_min_cost) {
+        u.actual_cost = u.estimated_min_cost;
+        print("update: ", u);
+
+        for (int i = -1; i <= 1; ++i) {
+          for (int j = -1; j <= 1; ++j) {
+            if (i == 0 && j == 0)
+              continue;
+
+            int newX = u.x + i;
+            int newY = u.y + j;
+
+            if (isValid(newX, newY)) {
+              print("updating: ", grid[newX][newY]);
+              updateVertex(grid[newX][newY]);
+              print("updated: ", grid[newX][newY]);
+            }
+          }
+        }
+      } else {
+        u.actual_cost = maxCost;
+        updateVertex(u);
+
+        for (int i = -1; i <= 1; ++i) {
+          for (int j = -1; j <= 1; ++j) {
+            if (i == 0 && j == 0)
+              continue;
+
+            int newX = u.x + i;
+            int newY = u.y + j;
+
+            if (isValid(newX, newY)) {
+              updateVertex(grid[newX][newY]);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 输出路径
+  void printPath() const {
+    Node current = start;
+
+    while (current != goal) {
+      cout << "(" << current.x << ", " << current.y << ") -> \n";
+      double minCost = maxCost;
+      Node next;
+
+      for (int i = -1; i <= 1; ++i) {
+        for (int j = -1; j <= 1; ++j) {
+          if (i == 0 && j == 0)
+            continue;
+
+          int newX = current.x + i;
+          int newY = current.y + j;
+
+          if (isValid(newX, newY) && grid[newX][newY].actual_cost < minCost) {
+            minCost = grid[newX][newY].actual_cost;
+            next = grid[newX][newY];
+          }
+        }
+      }
+
+      current = next;
+      this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+    cout << "(" << goal.x << ", " << goal.y << ")" << endl;
+  }
+};
+
+int main() {
+  // 创建DStarLite对象
+  DStarLite dstar(5, 5, 0, 0, 4, 4);
+
+  // 执行D* Lite算法
+  dstar.runDStarLite();
+
+  // 输出路径
+  dstar.printPath();
+
+  return 0;
+}

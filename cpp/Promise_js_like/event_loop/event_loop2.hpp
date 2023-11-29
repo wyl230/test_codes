@@ -1,14 +1,12 @@
 #pragma once
 #include "../to_be_checked.hpp"
-#include "event_loop/event_loop1.hpp"
+#include "event_loop1.hpp"
 #include "intrusive_list_base.hpp"
 #include <boost/asio.hpp>
 #include <chrono>
 #include <functional>
 #include <memory>
 #include <queue>
-
-class MessageLoop;
 
 class MessageLoop : public TimerProvider,
                     public DispatcherProvider,
@@ -108,10 +106,8 @@ public:
     }
 
   private:
-
     std::queue<std::function<void()>> handlers_;
     std::queue<std::function<void()>> g_task_queue;
-
   };
   void Post(std::function<void()> &&handler,
             Severity severity = Severity::kNormal) override {

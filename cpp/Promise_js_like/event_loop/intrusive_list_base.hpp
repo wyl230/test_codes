@@ -56,10 +56,55 @@ public:
 
 private:
   // 链表头指针和尾指针
+public:
   IntrusiveListNode<Tag> *head;
   IntrusiveListNode<Tag> *tail;
 };
 
+template <typename T, typename Tag>
+class IntrusiveList : public IntrusiveListBase<Tag> {
+public:
+  // Alias for the node type associated with this list
+  using NodeType = IntrusiveListNode<Tag>;
+
+  // Additional methods for IntrusiveList, if needed
+  // ...
+  // Iterator for the list
+  class iterator {
+  public:
+    iterator(NodeType *node) : current(node) {}
+
+    T &operator*() const { return *static_cast<T *>(current); }
+
+    iterator &operator++() {
+      current = current->next;
+      return *this;
+    }
+
+    bool operator!=(const iterator &other) const {
+      return current != other.current;
+    }
+
+  private:
+    NodeType *current;
+  };
+
+  // Function to obtain the beginning iterator
+  iterator begin() { return iterator(IntrusiveListBase<Tag>::head); }
+
+  // Function to obtain the ending iterator
+  iterator end() { return iterator(nullptr); }
+  void push_back(T &element) {
+    // IntrusiveListBase<Tag>::Append(&element.GetListNode());
+    // TODO:
+  }
+
+private:
+  // Inherit the implementation from IntrusiveListBase
+  using IntrusiveListBase<Tag>::Append;
+  using IntrusiveListBase<Tag>::Remove;
+  using IntrusiveListBase<Tag>::unlink;
+};
 // 定义 DestructionObserver，继承 IntrusiveListBase
 // class DestructionObserver : public IntrusiveListNode<DestructionObserverTag>
 // { public:

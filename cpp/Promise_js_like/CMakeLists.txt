@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.17)
 
 # ---------------------------------------------------------------------------------------------------
@@ -6,7 +5,7 @@ cmake_minimum_required(VERSION 3.17)
 project(test)
 # message("my_variable: ${PROJECT_SOURCE_DIR}/http_lib")
 
-# 2. set compiler
+# 1. set compiler
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -17,48 +16,48 @@ add_compile_options(-Wall -Wextra -fpermissive)
 
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 # add_executable(test main.c)
-add_executable(test main.cpp )
+add_executable(test main.cpp)
+
+add_executable(test_event_loop test_event_loop.cpp)
 # 如果有头文件，可以将它们包含在项目中
 target_include_directories(test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_include_directories(test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../time)
 
-target_include_directories(test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/.. )
-target_include_directories(test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../time )
+target_include_directories(test_event_loop PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(test_event_loop
+                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_include_directories(test_event_loop
+                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../time)
 
 # include_directories(/home/wyl/ln/test/cpp)
 
 #
-# # 添加http库
-# add_library(http_lib STATIC include/http_lib/http_lib.c include/http_lib/mongoose.c)
+# # 添加http库 add_library(http_lib STATIC include/http_lib/http_lib.c
+# include/http_lib/mongoose.c)
 #
-# target_include_directories(http_lib
-#     PUBLIC
-#         ${PROJECT_SOURCE_DIR}/include
-# )
+# target_include_directories(http_lib PUBLIC ${PROJECT_SOURCE_DIR}/include )
 #
 find_package(Threads REQUIRED)
 link_directories(${CMAKE_SOURCE_DIR})
 #
 target_link_libraries(test PRIVATE Threads::Threads)
+target_link_libraries(test_event_loop PRIVATE Threads::Threads)
 # target_link_libraries(test PRIVATE http_lib)
 #
-# ## FetchContent
-# # add my http_lib
-# include(FetchContent)
+# ## FetchContent # add my http_lib include(FetchContent)
 #
-# FetchContent_Declare(
-#   readerwriterqueue
-#   GIT_REPOSITORY    https://github.com/cameron314/readerwriterqueue
-#   GIT_TAG           master
-# )
+# FetchContent_Declare( readerwriterqueue GIT_REPOSITORY
+# https://github.com/cameron314/readerwriterqueue GIT_TAG           master )
 #
 # FetchContent_MakeAvailable(readerwriterqueue)
 #
 # target_link_libraries(test PUBLIC readerwriterqueue)
 #
-# # add json
-# include(FetchContent)
+# # add json include(FetchContent)
 #
-# FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
+# FetchContent_Declare(json URL
+# https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
 # FetchContent_MakeAvailable(json)
 #
 # target_link_libraries(test PRIVATE nlohmann_json::nlohmann_json)
