@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/wyl/ln/test/cpp/pybind11",
+  "command": "/usr/bin/c++ -Dlist_example_EXPORTS -isystem /home/wyl/ln/test/cpp/pybind11/pybind11/include -isystem /usr/include/python3.9 -fPIC -fvisibility=hidden -flto -fno-fat-lto-objects -std=gnu++17 -o CMakeFiles/list_example.dir/list_example.cpp.o -c /home/wyl/ln/test/cpp/pybind11/list_example.cpp",
+  "file": "/home/wyl/ln/test/cpp/pybind11/list_example.cpp"
+},
+{
+  "directory": "/home/wyl/ln/test/cpp/pybind11",
+  "command": "/usr/bin/c++ -Dexample_EXPORTS -isystem /home/wyl/ln/test/cpp/pybind11/pybind11/include -isystem /usr/include/python3.9 -fPIC -fvisibility=hidden -flto -fno-fat-lto-objects -std=gnu++17 -o CMakeFiles/example.dir/example.cpp.o -c /home/wyl/ln/test/cpp/pybind11/example.cpp",
+  "file": "/home/wyl/ln/test/cpp/pybind11/example.cpp"
+}
+]
