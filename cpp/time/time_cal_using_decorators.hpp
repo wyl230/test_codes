@@ -19,7 +19,6 @@ inline void exclaim(const std::function<void()> &func) {
 
 inline void exclaim(const std::function<void()> &func,
                     const std::string_view msg) {
-  std::cout << msg << std::endl;
   auto start = std::chrono::high_resolution_clock::now();
   func();
   auto end = std::chrono::high_resolution_clock::now();
@@ -27,8 +26,11 @@ inline void exclaim(const std::function<void()> &func,
       std::chrono::duration_cast<std::chrono::microseconds>(end - start)
           .count();
 
+  std::cout << msg << ": ";
   // Print the time interval
-  std::cout << "Time interval: " << duration << " microseconds" << std::endl;
+  std::cout << "Time interval: " << duration
+            << " microseconds: s:" << static_cast<double>(duration) / 1e6
+            << std::endl;
 }
 
 template <typename funcType> void exclaim(const funcType &func) {
@@ -40,7 +42,9 @@ template <typename funcType> void exclaim(const funcType &func) {
           .count();
 
   // Print the time interval
-  std::cout << "Time interval: " << duration << " microseconds" << std::endl;
+  std::cout << "Time interval: " << duration
+            << " microseconds: " << static_cast<double>(duration) / 1e6
+            << std::endl;
 }
 
 // Function to measure time interval
