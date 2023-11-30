@@ -1,10 +1,14 @@
+#include <chrono>
 #include <coroutine>
 #include <future>
 #include <iostream>
+#include <print.hpp>
 #include <string>
+#include <thread>
 
 using namespace std;
 
+// lazy 是 协程的返回值类型
 template <typename T> struct lazy {
   struct promise_type;
   using handle = std::coroutine_handle<promise_type>;
@@ -19,6 +23,17 @@ template <typename T> struct lazy {
     void unhandled_exception() { std::terminate(); }
     void return_value(T value) { _return_value = value; }
   };
+
+  bool resume() {
+    print("Coroutine is resumed...\n");
+    if (!coro.done()) {
+      print("Coroutine is not done...\n");
+      coro.resume();
+    }
+    print("return resume\n");
+    return !coro.done();
+  }
+
   bool calculate() {
     if (calculated)
       return true;
@@ -45,8 +60,69 @@ private:
 
 lazy<std::string> f(std::string n = "qwer") { co_return n + "asdf"; }
 
+lazy<int> calculate_sum() {
+  co_await std::suspend_always{};
+  co_return 1 + 2 + 3;
+}
+
+void basic_test() {
+  lazy<int> result = calculate_sum();
+  // result.resume();
+  // result.resume();
+  while (!result.calculate())
+    ;
+  std::cout << "Result: " << result.get() << std::endl; // 执行实际的计算
+}
+
+lazy<int> async_task() {
+  std::cout << "Task started..." << std::endl;
+  co_await std::suspend_always{};
+  std::this_thread::sleep_for(std::chrono::seconds(1)); // 模拟异步操作
+  std::cout << "Task completed." << std::endl;
+  co_return 42;
+}
+
+void async_task_test() {
+  lazy<int> result = async_task();
+  std::cout << "Waiting for task to complete..." << std::endl;
+  while (!result.calculate())
+    ;
+  // std::this_thread::sleep_for(
+  //     std::chrono::seconds(1)); // 在此期间任务并未真正开始
+  std::cout << "Result: " << result.get() << std::endl; // 开始并等待任务完成
+}
+
+lazy<int> lazy_calculation() {
+  std::cout << "Performing lazy calculation..." << std::endl;
+  co_await std::suspend_always{};
+  co_return 7 * 6 * 3;
+}
+
+void lazy_calculation_test() {
+  lazy<int> result = lazy_calculation();
+
+  // 在此处执行其他操作，直到需要获取结果时才进行实际计算
+  std::cout << "Some other work..." << std::endl;
+  while (!result.calculate())
+    ;
+
+  std::cout << "Lazy Result: " << result.get() << std::endl; // 执行实际的计算
+}
+
 int main() {
-  auto g = f();
-  g.calculate(); // 这时才从 initial_suspend 之中恢复, 所以就叫 lazy 了
-  cout << g.get();
+  print("==========");
+  print("basic_test");
+  print("----------");
+  basic_test();
+  print("==========");
+  print("async_task_test");
+  print("----------");
+  async_task_test();
+  print("==========");
+  print("lazy_calculation_test");
+  print("----------");
+  lazy_calculation_test();
+  // auto g = f();
+  // g.calculate(); // 这时才从 initial_suspend 之中恢复, 所以就叫 lazy 了
+  // cout << g.get();
 }
