@@ -1,3 +1,4 @@
+#pragma once
 #include <cstddef>
 
 // 定义 DestructionObserverTag
@@ -110,3 +111,14 @@ private:
 //   virtual void WillDestruct() = 0;
 //   virtual ~DestructionObserver() {}
 // };
+
+struct TaskObserverTag {};
+template <> class IntrusiveListBase<TaskObserverTag> {
+public:
+  virtual void HandleTaskBefore() = 0;
+  virtual void HandleTaskAfter() = 0;
+  virtual ~IntrusiveListBase() {}
+};
+
+template <typename T>
+class IntrusiveList : public IntrusiveListBase<TaskObserverTag> {};

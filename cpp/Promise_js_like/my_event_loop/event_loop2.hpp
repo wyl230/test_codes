@@ -15,6 +15,7 @@ class MessageLoop : public TimerProvider,
                     // public PollerProvider,
                     public std::enable_shared_from_this<MessageLoop> {
 public:
+  MessageLoop() = default;
   enum Type {
     kTypeDefault,
     kTypeIO,
@@ -24,16 +25,12 @@ public:
 
   explicit MessageLoop(Type type);
 
-  ~MessageLoop() override;
-
   static MessageLoop *Current();
 
 public:
   struct DestructionObserverTag {};
   class DestructionObserver : public IntrusiveListBase<DestructionObserverTag> {
   public:
-    virtual void WillDestruct() = 0;
-    virtual ~DestructionObserver() {}
   };
 
   void AddDestructionObserver(DestructionObserver *ob) {
@@ -42,12 +39,9 @@ public:
   void RemoveDestructionObserver(DestructionObserver *ob) { ob->unlink(); }
 
 public:
-  struct TaskObserverTag {};
   class TaskObserver : public IntrusiveListBase<TaskObserverTag> {
   public:
-    virtual void HandleTaskBefore() = 0;
-    virtual void HandleTaskAfter() = 0;
-    virtual ~TaskObserver() {}
+    void HandleTaskBefore() { printf("before task\n"); }
   };
 
   void AddTaskObserver(TaskObserver *ob) { task_observers_.push_back(*ob); }
@@ -55,8 +49,6 @@ public:
 
 public:
   using Proactor = boost::asio::io_context;
-  virtual Proactor *proactor() { return nullptr; }
-  virtual const Proactor *proactor() const { return nullptr; }
 
 public:
   enum State {
@@ -70,18 +62,14 @@ public:
   void set_state(State state) { state_ = state; }
   bool IsRunning() const { return state() == kRunning; }
 
-  virtual void Run() = 0;
-  virtual void Shutdown() = 0;
-  virtual void GracefulShutdown() = 0;
-
 public:
   bool IsInMessageLoopThread() const { return Current() == this; }
 
-  void Dispatch(MessageLoop *loop, std::function<void()> &&handler) override {
+  void Dispatch(MessageLoop *loop, std::function<void()> &&handler) {
     if (loop->IsInMessageLoopThread()) {
       handler();
     } else {
-      loop->remote_executor()->Post(std::move(handler));
+      // loop->remote_executor()->Post(std::move(handler));
     }
   }
 
@@ -110,7 +98,7 @@ public:
     std::queue<std::function<void()>> g_task_queue;
   };
   void Post(std::function<void()> &&handler,
-            Severity severity = Severity::kNormal) override {
+            Severity severity = Severity::kNormal) {
     switch (severity) {
     case Severity::kUrgent:
       urgent_.Post(std::move(handler));
@@ -137,7 +125,7 @@ public:
         .count();
   }
 
-  void RunAt(std::function<void(Error &&)> &&handler, Tm tm) override {}
+  void RunAt(std::function<void(Error &&)> &&handler, Tm tm) {}
 
   template <class Rep, class Period>
   void RunAfter(std::function<void(Error &&)> &&handler,
@@ -159,12 +147,12 @@ public:
 
 public:
   Executor *executor() { return &normal_; }
-  virtual Executor *remote_executor() = 0;
 
 protected:
+public:
   void RunOneTask(std::function<void()> &&handler) {
-    // std::for_each(task_observers_.begin(), task_observers_.end(),
-    //               [](TaskObserver &ob) mutable { ob.HandleTaskBefore(); });
+    std::for_each(task_observers_.begin(), task_observers_.end(),
+                  [](TaskObserver &ob) mutable { ob.HandleTaskBefore(); });
     handler();
     // std::for_each(task_observers_.begin(), task_observers_.end(),
     //               [](TaskObserver &ob) mutable { ob.HandleTaskAfter(); });
@@ -195,5 +183,6 @@ protected:
   LocalExecutor normal_;
 
   IntrusiveList<TaskObserver, TaskObserverTag> task_observers_;
-  IntrusiveList<DestructionObserver, DestructionObserverTag> dctor_observers_;
+  // IntrusiveList<DestructionObserver, DestructionObserverTag>
+  // dctor_observers_;
 };
