@@ -5,13 +5,13 @@
 #include <thread>
 
 // write a template function to print anything
-template <typename T> void print(const T &t) { std::cout << t << std::endl; }
-
-template <typename T, typename... Args>
-void print(const T &t, const Args &...args) {
-  std::cout << t << " ";
-  print(args...);
-}
+// template <typename T> void print(const T &t) { std::cout << t << std::endl; }
+//
+// template <auto sep = ' ', typename T, typename... Args>
+// void print(const T &t, const Args &...args) {
+//   std::cout << t << sep;
+//   print(args...);
+// }
 
 static auto const now = std::chrono::steady_clock::now;
 static auto const start = now();
@@ -32,4 +32,12 @@ static void trace_us(auto const &...args) {
   std::lock_guard lk(mx);
   std::cout << std::setw(8) << (now() - start) / 1us << " us: ";
   (std::cout << ... << args) << std::endl;
+}
+
+template <auto Sep = ' ', auto End = '\n', typename First, typename... Args>
+void print(const First &first, const Args &...args) {
+  std::cout << first;
+  auto outWithSep = [](const auto &arg) { std::cout << Sep << arg; };
+  (..., outWithSep(args));
+  std::cout << End;
 }
