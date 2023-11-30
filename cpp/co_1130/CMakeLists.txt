@@ -8,7 +8,7 @@ project(test)
 # 1. set compiler
 set(CMAKE_CXX_STANDARD 20)
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines -fno-exceptions -O0")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines  -O0")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines  -O0 -g")
 # set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
