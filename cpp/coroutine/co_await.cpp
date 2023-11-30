@@ -46,6 +46,7 @@ auto operator co_await(std::chrono::duration<Rep, Period> d) {
     bool await_ready() const { return duration.count() <= 0; }
     int await_resume() { return 1; }
     void await_suspend(std::coroutine_handle<> h) {
+      printf("Start sleeping\n");
       std::this_thread::sleep_for(duration);
     }
   };

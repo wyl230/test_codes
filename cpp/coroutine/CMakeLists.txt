@@ -18,7 +18,7 @@ add_compile_options(-Wall -Wextra)
 
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 # add_executable(test co_return.c)
-add_executable(test co_return.cpp)
+add_executable(test co_await.cpp)
 # 如果有头文件，可以将它们包含在项目中
 target_include_directories(test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
