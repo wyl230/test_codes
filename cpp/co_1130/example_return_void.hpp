@@ -20,13 +20,12 @@ struct AsyncTask {
   void await_suspend(std::coroutine_handle<> coroHandle) const {
     // 模拟异步操作，例如在另一个线程中执行
     print("Async task is suspended...");
-    // std::thread([coroHandle]() {
-    //   print("Async task is running...\n");
-    //   std::this_thread::sleep_for(std::chrono::seconds(1));
-    //   std::cout << "Async task is done!\n";
-    //   coroHandle.resume(); // 恢复协程的执行
-    // }).detach();
-    // coroHandle.resume();
+    std::thread([coroHandle]() {
+      print("Async task is running...");
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+      std::cout << "Async task is done!\n";
+      coroHandle.resume(); // 恢复协程的执行
+    }).detach();
   }
 
   void await_resume() const noexcept {
@@ -97,7 +96,7 @@ inline MyCoroutine asyncTask() {
 
 inline void example() {
   MyCoroutine coro = asyncTask();
-  coro.resume();
+  // coro.resume();
   // print("emm");
   // print("is done? ", !coro.resume());
   // print("is done? ", !coro.resume());
@@ -105,8 +104,10 @@ inline void example() {
   // 在实际应用中，可能需要通过事件循环等方式来处理协程的执行
   // 这里为了演示，简单地等待协程完成
 
-  std::cout << "Main continues...\n";
-
-  // std::this_thread::sleep_for(std::chrono::seconds(2));
+  print("Main continues...");
+  for (int i = 0; i < 12; ++i) {
+    print("i = ", i);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
 }
 } // namespace async_with_coroutine

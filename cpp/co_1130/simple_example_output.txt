@@ -1,0 +1,40 @@
+Start main()
+> > Promise created
+> > Send back a sync
+> > > Created a sync object
+> > Started the coroutine, don't stop now!
+Started await_answer
+> > Promise created
+> > Send back a lazy
+> > > Created a lazy object
+> > Started the coroutine, put the brakes on!
+> > Await isn't ready
+> > About to resume the lazy
+> > > Reading data...
+> > > > (lazy)Got an answer of billion$!
+> > > Finished the coro
+> > About to resume the awaiter
+> > > Await value is returned: billion$!
+> > > lazy gone
+> > > > Promise died
+Data we got is billion$!
+> > > Promise created
+> > > Send back a lazy
+> > > > Created a lazy object
+> > > Started the coroutine, put the brakes on!
+> > > Await isn't ready
+> > > About to resume the lazy
+> > > > Write data...
+> > > > > (lazy)Got an answer of I'm rich!
+> > > > Finished the coro
+> > > About to resume the awaiter
+> > > > Await value is returned: I'm rich!
+> > > > lazy gone
+> > > > > Promise died
+write result is I'm rich!
+> > > > (sync)Got an answer of 42
+> > > > Finished the coro
+> > We got asked for the return value...
+we get a: 42
+> > Sync gone
+> > > Promise died
