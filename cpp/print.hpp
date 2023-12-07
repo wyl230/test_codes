@@ -4,6 +4,8 @@
 #include <iostream>
 #include <mutex>
 #include <thread>
+#define PRINTx(x) print(__func__, '(', __LINE__, ')', x)
+#define PRINT print(__func__, '(', __LINE__, ')')
 
 // write a template function to print anything
 // template <typename T> void print(const T &t) { std::cout << t << std::endl; }
