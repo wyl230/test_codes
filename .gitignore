@@ -40,3 +40,13 @@ tmptest
 cpp/benchmark/sltbench
 cpp/coroutine/cppcoro
 cpp/coroutine/temp
+cpp/arrow
+cpp/http_server
+cpp/pybind11
+cpp/pybind11
+cpp/react/cpp.react
+cpp/pybind11/pybind11_examples
+cpp/using_fetch_content/
+cpp/uvw/uvw
+go/lemonade/
+git_test
